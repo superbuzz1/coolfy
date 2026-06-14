@@ -10,6 +10,8 @@ export type Mood = {
   tagline: string;
   /** Tailwind gradient classes used for the mood card / header. */
   gradient: string;
+  /** Filter categories this mood belongs to. */
+  tags: string[];
   tracks: Track[];
 };
 
@@ -20,6 +22,7 @@ export const moods: Mood[] = [
     emoji: "🌊",
     tagline: "Lean back and let it drift.",
     gradient: "from-sky-400 to-cyan-300",
+    tags: ["relaxed"],
     tracks: [
       { title: "Slow Tide", artist: "Marlow" },
       { title: "Paper Boats", artist: "Hana Lune" },
@@ -34,6 +37,7 @@ export const moods: Mood[] = [
     emoji: "🎯",
     tagline: "Deep work, no distractions.",
     gradient: "from-indigo-500 to-violet-400",
+    tags: ["productive"],
     tracks: [
       { title: "Flow State", artist: "Kemp" },
       { title: "Long Hours", artist: "Atlas Room" },
@@ -48,6 +52,7 @@ export const moods: Mood[] = [
     emoji: "⚡",
     tagline: "Turn it all the way up.",
     gradient: "from-orange-500 to-pink-500",
+    tags: ["energetic"],
     tracks: [
       { title: "Redline", artist: "Pulse Theory" },
       { title: "Ignition", artist: "Kova" },
@@ -62,6 +67,7 @@ export const moods: Mood[] = [
     emoji: "🕯️",
     tagline: "Soft light, warm sound.",
     gradient: "from-amber-400 to-rose-300",
+    tags: ["reflective"],
     tracks: [
       { title: "Knit", artist: "Maple Street" },
       { title: "Slow Sunday", artist: "Wren" },
@@ -76,6 +82,7 @@ export const moods: Mood[] = [
     emoji: "🌧️",
     tagline: "For the bittersweet evenings.",
     gradient: "from-slate-500 to-blue-400",
+    tags: ["reflective"],
     tracks: [
       { title: "Last Train", artist: "Greyling" },
       { title: "Empty Rooms", artist: "Sora" },
@@ -90,6 +97,7 @@ export const moods: Mood[] = [
     emoji: "🌅",
     tagline: "Ease into a brand new day.",
     gradient: "from-yellow-300 to-orange-400",
+    tags: ["productive", "relaxed"],
     tracks: [
       { title: "First Light", artist: "Coastal" },
       { title: "Morning Glow", artist: "Petra" },
@@ -99,6 +107,11 @@ export const moods: Mood[] = [
     ],
   },
 ];
+
+/** Unique, sorted list of all tags across moods — for filter UI. */
+export const allTags: string[] = Array.from(
+  new Set(moods.flatMap((mood) => mood.tags)),
+).sort();
 
 export function getMood(slug: string): Mood | undefined {
   return moods.find((mood) => mood.slug === slug);

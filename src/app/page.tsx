@@ -1,4 +1,5 @@
-import { moods } from "@/lib/moods";
+import { Suspense } from "react";
+import { allTags, moods } from "@/lib/moods";
 import MoodBrowser from "./MoodBrowser";
 
 export default function Home() {
@@ -11,7 +12,11 @@ export default function Home() {
         </p>
       </header>
 
-      <MoodBrowser moods={moods} />
+      {/* MoodBrowser reads useSearchParams(); Suspense is required for the
+          statically-prerendered home route to build (Next.js 16). */}
+      <Suspense fallback={<div className="min-h-[60vh]" />}>
+        <MoodBrowser moods={moods} tags={allTags} />
+      </Suspense>
     </main>
   );
 }
