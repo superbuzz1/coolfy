@@ -1,39 +1,55 @@
-import type { Metadata } from "next";
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { useParams, notFound } from "next/navigation";
 import {
-  getMood,
   moodYoutubeUrl,
   moods,
   spotifySearchUrl,
   youtubeSearchUrl,
+  type Mood
 } from "@/lib/moods";
 
-export function generateStaticParams() {
-  return moods.map((mood) => ({ slug: mood.slug }));
-}
+export default function MoodPage() {
+  const params = useParams();
+  const slug = params?.slug as string;
+  const [mood, setMood] = useState<Mood | undefined>(undefined);
+  const [loading, setLoading] = useState(true);
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
-  const { slug } = await params;
-  const mood = getMood(slug);
-  if (!mood) return { title: "Mood not found — Coolfy" };
-  return {
-    title: `${mood.name} — Coolfy`,
-    description: mood.tagline,
-  };
-}
+  useEffect(() => {
+    if (!slug) return;
+    
+    // Set tab title dynamically
+    let found = moods.find((m) => m.slug === slug);
+    
+    if (!found) {
+      const stored = localStorage.getItem("custom-moods");
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored) as Mood[];
+          found = parsed.find((m) => m.slug === slug);
+        } catch (e) {
+          console.error("Error loading custom moods", e);
+        }
+      }
+    }
+    
+    if (found) {
+      document.title = `${found.name} — Coolfy`;
+    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMood(found);
+    setLoading(false);
+  }, [slug]);
 
-export default async function MoodPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params;
-  const mood = getMood(slug);
+  if (loading) {
+    return (
+      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center py-24">
+        <div className="w-10 h-10 border-4 border-black/10 dark:border-white/10 border-t-zinc-600 dark:border-t-zinc-400 rounded-full animate-spin"></div>
+      </main>
+    );
+  }
 
   if (!mood) {
     notFound();
