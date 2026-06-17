@@ -2,16 +2,22 @@
 import React, { useState } from 'react';
 import { 
   TrendingUp, DollarSign, Activity, Target, Brain, 
-  BarChart2, Zap, AlertTriangle, CheckCircle2, ChevronRight, 
-  Users, Layers, ArrowUpRight, ArrowDownRight, Clock
+  Zap, AlertTriangle, Users, ArrowUpRight, ArrowDownRight
 } from 'lucide-react';
 import { 
-  BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, 
-  Tooltip, ResponsiveContainer, AreaChart, Area, ComposedChart
+  XAxis, YAxis, CartesianGrid, 
+  Tooltip, ResponsiveContainer, Area, Line, ComposedChart
 } from 'recharts';
 
+type TabId = 'overview' | 'deals' | 'ai-model';
+
 export default function PipelineForecastingDashboard() {
-  const [activeTab, setActiveTab] = useState<'overview' | 'deals' | 'ai-model'>('overview');
+  const [activeTab, setActiveTab] = useState<TabId>('overview');
+  const [isMounted, setIsMounted] = useState(false);
+
+  React.useEffect(() => {
+    setIsMounted(true); // eslint-disable-line react-hooks/set-state-in-effect
+  }, []);
 
   const [pipelineData] = useState([
     { month: 'Jul', actual: 42000, forecast: 45000, bestCase: 55000, probability: 100 },
@@ -65,7 +71,7 @@ export default function PipelineForecastingDashboard() {
             ].map(tab => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id as TabId)}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
                   activeTab === tab.id 
                     ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20' 
@@ -154,33 +160,37 @@ export default function PipelineForecastingDashboard() {
               </div>
             </div>
             <div className="h-[350px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={pipelineData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
-                    </linearGradient>
-                    <linearGradient id="colorForecast" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                  <XAxis dataKey="month" stroke="#475569" tick={{fill: '#94a3b8', fontSize: 11, fontFamily: 'monospace'}} axisLine={false} tickLine={false} />
-                  <YAxis stroke="#475569" tick={{fill: '#94a3b8', fontSize: 11, fontFamily: 'monospace'}} tickFormatter={(val) => `$${val/1000}k`} axisLine={false} tickLine={false} />
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: '#020617', border: '1px solid #1e293b', borderRadius: '8px', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.5)' }}
-                    itemStyle={{ fontSize: '12px', fontWeight: 'bold', fontFamily: 'monospace' }}
-                    labelStyle={{ color: '#94a3b8', marginBottom: '8px' }}
-                  />
-                  <Area type="monotone" dataKey="actual" fill="url(#colorActual)" stroke="none" />
-                  <Area type="monotone" dataKey="forecast" fill="url(#colorForecast)" stroke="none" />
-                  <Line type="monotone" dataKey="actual" name="Actual Won" stroke="#10b981" strokeWidth={3} dot={{r: 4, strokeWidth: 2}} activeDot={{r: 6}} />
-                  <Line type="monotone" dataKey="forecast" name="AI Forecast" stroke="#6366f1" strokeWidth={3} strokeDasharray="5 5" dot={{r: 4, strokeWidth: 2}} activeDot={{r: 6}} />
-                  <Line type="monotone" dataKey="bestCase" name="Best Case" stroke="#a855f7" strokeWidth={2} strokeDasharray="2 2" dot={false} />
-                </ComposedChart>
-              </ResponsiveContainer>
+              {isMounted ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <ComposedChart data={pipelineData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                      </linearGradient>
+                      <linearGradient id="colorForecast" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                    <XAxis dataKey="month" stroke="#475569" tick={{fill: '#94a3b8', fontSize: 11, fontFamily: 'monospace'}} axisLine={false} tickLine={false} />
+                    <YAxis stroke="#475569" tick={{fill: '#94a3b8', fontSize: 11, fontFamily: 'monospace'}} tickFormatter={(val) => `$${val/1000}k`} axisLine={false} tickLine={false} />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: '#020617', border: '1px solid #1e293b', borderRadius: '8px', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.5)' }}
+                      itemStyle={{ fontSize: '12px', fontWeight: 'bold', fontFamily: 'monospace' }}
+                      labelStyle={{ color: '#94a3b8', marginBottom: '8px' }}
+                    />
+                    <Area type="monotone" dataKey="actual" fill="url(#colorActual)" stroke="none" />
+                    <Area type="monotone" dataKey="forecast" fill="url(#colorForecast)" stroke="none" />
+                    <Line type="monotone" dataKey="actual" name="Actual Won" stroke="#10b981" strokeWidth={3} dot={{r: 4, strokeWidth: 2}} activeDot={{r: 6}} />
+                    <Line type="monotone" dataKey="forecast" name="AI Forecast" stroke="#6366f1" strokeWidth={3} strokeDasharray="5 5" dot={{r: 4, strokeWidth: 2}} activeDot={{r: 6}} />
+                    <Line type="monotone" dataKey="bestCase" name="Best Case" stroke="#a855f7" strokeWidth={2} strokeDasharray="2 2" dot={false} />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="w-full h-full bg-slate-900/20 animate-pulse rounded-xl" />
+              )}
             </div>
           </div>
         </div>
@@ -306,7 +316,7 @@ export default function PipelineForecastingDashboard() {
                 <div>
                   <h4 className="text-white font-bold mb-1">AI Recommendation</h4>
                   <p className="text-sm text-indigo-200 leading-relaxed">
-                    Based on current pipeline velocity, we recommend initiating a targeted <strong>Q4 closing promotion</strong> specifically for deals in the "Negotiation" stage. This has a 78% probability of accelerating $240k in revenue into this quarter.
+                    Based on current pipeline velocity, we recommend initiating a targeted <strong>Q4 closing promotion</strong> specifically for deals in the &quot;Negotiation&quot; stage. This has a 78% probability of accelerating $240k in revenue into this quarter.
                   </p>
                   <button className="mt-3 px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-bold rounded-lg shadow-lg shadow-indigo-500/20 transition-all">
                     Generate Campaign Automation
@@ -353,11 +363,11 @@ export default function PipelineForecastingDashboard() {
               <div className="space-y-3">
                 <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-lg text-xs text-rose-300">
                   <strong className="block font-bold text-rose-400 mb-0.5 font-mono">Stalled Deals</strong>
-                  4 deals over $50k have been in "Discovery" for &gt;30 days.
+                  4 deals over $50k have been in &quot;Discovery&quot; for &gt;30 days.
                 </div>
                 <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg text-xs text-amber-300">
                   <strong className="block font-bold text-amber-400 mb-0.5 font-mono">Champion Left</strong>
-                  Key contact at Globex recently changed LinkedIn title to "Looking for work".
+                  Key contact at Globex recently changed LinkedIn title to &quot;Looking for work&quot;.
                 </div>
               </div>
             </div>

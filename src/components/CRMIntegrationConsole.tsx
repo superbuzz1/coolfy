@@ -1,15 +1,25 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   Database, Link, RefreshCw, CheckCircle, AlertTriangle,
   ArrowRightLeft, Settings, ShieldCheck, Activity, Terminal
 } from 'lucide-react';
 
+interface Integration {
+  provider: string;
+  lastSyncAt: string;
+  status: string;
+  direction: string;
+  records: number;
+}
+
+const INITIAL_INTEGRATIONS: Integration[] = [
+  { provider: 'salesforce', lastSyncAt: new Date().toISOString(), status: 'active', direction: 'bidirectional', records: 42801 },
+  { provider: 'hubspot', lastSyncAt: new Date(Date.now() - 3600000).toISOString(), status: 'active', direction: 'inbound', records: 1240 }
+];
+
 export default function CRMIntegrationConsole() {
-  const [integrations, setIntegrations] = useState<any[]>([
-    { provider: 'salesforce', lastSyncAt: new Date().toISOString(), status: 'active', direction: 'bidirectional', records: 42801 },
-    { provider: 'hubspot', lastSyncAt: new Date(Date.now() - 3600000).toISOString(), status: 'active', direction: 'inbound', records: 1240 }
-  ]);
+  const [integrations, setIntegrations] = useState<Integration[]>(INITIAL_INTEGRATIONS);
   const [loading, setLoading] = useState(false);
   const [syncing, setSyncing] = useState<string | null>(null);
 
@@ -179,7 +189,7 @@ export default function CRMIntegrationConsole() {
           <h4 className="text-sm font-bold text-white mb-1">Conflict Resolution Strategy</h4>
           <p className="text-xs text-gray-400 leading-relaxed">
             By default, EffectiveBuzz treats your connected CRM as the <strong>Source of Truth</strong>. 
-            If a contact's email or phone number is updated simultaneously in both systems, the CRM data will overwrite RevOS data during the next sync cycle. You can modify this per-field in the Configuration Mappings.
+            If a contact&apos;s email or phone number is updated simultaneously in both systems, the CRM data will overwrite RevOS data during the next sync cycle. You can modify this per-field in the Configuration Mappings.
           </p>
         </div>
       </div>
